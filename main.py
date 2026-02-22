@@ -1,9 +1,11 @@
 """
-CollabBoard AI Service v3
+CollabBoard AI Service v4
 --------------------------
 Single-layer AI endpoint powered by claude-sonnet-4-6 via LangChain.
 
-v3 adds: updateObject, deleteObjects, alignObjects, distributeObjects, createTemplate
+# Version 4.0.0 - Added summarizeBoard feature
+
+v4 adds: summarizeBoard (AI-generated board analysis with key points, risks, action items)
 Full board state is accepted and injected into the system prompt so Claude
 can target specific objects by ID.
 
@@ -30,7 +32,7 @@ from pydantic import BaseModel
 app = FastAPI(
     title="CollabBoard AI Service",
     description="claude-sonnet-4-6 powered whiteboard command interpreter.",
-    version="3.0.0",
+    version="4.0.0",
 )
 
 app.add_middleware(
@@ -304,6 +306,44 @@ TOOLS: list[dict[str, Any]] = [
             },
         },
     },
+    # ── Board analysis ────────────────────────────────────────────────────────
+    {
+        "type": "function",
+        "function": {
+            "name": "summarizeBoard",
+            "description": (
+                "Analyze the current board content and generate a structured summary. "
+                "Use when the user asks: 'summarize the board', 'what are the action items?', "
+                "'give me a summary', 'analyze this board', '/summarize'. "
+                "Read all object text from the board state, then fill in the summary fields."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "A concise title (5–10 words) capturing the board's overall purpose.",
+                    },
+                    "key_points": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "3–5 main ideas or themes extracted from the board content.",
+                    },
+                    "risks": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "2–3 risks, concerns, or challenges visible on the board.",
+                    },
+                    "action_items": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "3–5 concrete next steps derived from the board content.",
+                    },
+                },
+                "required": ["title", "key_points", "risks", "action_items"],
+            },
+        },
+    },
     # ── Camera / viewport ─────────────────────────────────────────────────────
     {
         "type": "function",
@@ -447,6 +487,10 @@ CAMERA:
 - "zoom in/out" → setZoom
 - "reset" (view) → resetView
 
+ANALYSIS:
+- "summarize" / "summary" / "action items" / "analyze the board" / "/summarize" → summarizeBoard
+  (read the board state above and synthesize real content — do not leave fields empty)
+
 ═══ BOARD STATE ═══════════════════════════════════════════════════════════════
 {format_board_state(board_state)}
 """
@@ -519,7 +563,7 @@ async def ai_command_v2(body: AICommandRequest) -> AICommandResponse:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "3.0.0"}
+    return {"status": "ok", "version": "4.0.0"}
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
