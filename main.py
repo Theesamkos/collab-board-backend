@@ -540,8 +540,27 @@ ANALYSIS:
   (read the board state above and synthesize real content — do not leave fields empty)
 
 THEMING:
-- "apply theme" / "make it professional" / "dark mode" / "use pastel" / "creative theme" / "change theme" → applyTheme
-  Assign a color to EVERY object in the board state. Vary primary/secondary/accent for visual interest.
+- "apply theme" / "make it professional" / "dark mode" / "use pastel" / "creative theme" /
+  "change theme" / "make this look good" / "make it pretty" / "brighten this up" → applyTheme
+
+  INTELLIGENT THEME SELECTION — when the user is vague, analyze the board content and pick the best theme:
+  • professional → business content: SWOT analysis, roadmaps, org charts, meeting notes, KPIs, action items
+  • creative     → brainstorming, ideation, mind maps, creative projects, design work
+  • dark         → user explicitly says "dark mode", OR board contains technical/coding/engineering content
+  • pastel       → casual, playful, or educational content; also use when asked to "brighten up" or "make it pretty"
+
+  EXPLICIT MAPPINGS:
+  "make this look professional" / "corporate" / "business"     → professional
+  "dark mode" / "dark theme" / "make it dark"                  → dark
+  "make it pretty" / "brighten" / "colorful" / "fun"          → pastel or creative (pick by content)
+  "creative" / "brainstorm" / "ideation"                       → creative
+  "make this look good" / "improve colors" / no clear hint     → analyze board text and pick best fit
+
+  COLORING RULES:
+  - Assign a color to EVERY object in the board state (no object left unchanged).
+  - Vary primary/secondary/accent across objects for visual interest — avoid making everything the same color.
+  - Frames and background containers → use a lighter/muted variant of the palette.
+
   Palettes:
     professional: primary=#2C3E50  secondary=#3498DB  accent=#E74C3C
     creative:     primary=#9B59B6  secondary=#F39C12  accent=#E91E63
