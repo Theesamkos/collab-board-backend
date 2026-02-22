@@ -1,10 +1,11 @@
 """
-CollabBoard AI Service v4
+CollabBoard AI Service v5
 --------------------------
 Single-layer AI endpoint powered by claude-sonnet-4-6 via LangChain.
 
-# Version 4.0.0 - Added summarizeBoard feature
+# Version 5.0.0 - Added applyTheme tool
 
+v5 adds: applyTheme (apply professional/creative/dark/pastel color themes to all board objects)
 v4 adds: summarizeBoard (AI-generated board analysis with key points, risks, action items)
 Full board state is accepted and injected into the system prompt so Claude
 can target specific objects by ID.
@@ -32,7 +33,7 @@ from pydantic import BaseModel
 app = FastAPI(
     title="CollabBoard AI Service",
     description="claude-sonnet-4-6 powered whiteboard command interpreter.",
-    version="4.0.0",
+    version="5.0.0",
 )
 
 app.add_middleware(
@@ -344,6 +345,53 @@ TOOLS: list[dict[str, Any]] = [
             },
         },
     },
+    # ── Theming ───────────────────────────────────────────────────────────────
+    {
+        "type": "function",
+        "function": {
+            "name": "applyTheme",
+            "description": (
+                "Apply a color theme to all objects on the board. "
+                "Use when the user asks: 'apply a theme', 'make it look professional', "
+                "'use dark mode', 'apply pastel colors', 'creative theme', 'change the theme'. "
+                "Assign colors from the chosen theme palette to every object. "
+                "Vary primary/secondary/accent across objects for visual interest."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "theme": {
+                        "type": "string",
+                        "enum": ["professional", "creative", "dark", "pastel"],
+                        "description": (
+                            "Theme to apply. "
+                            "professional: navy/blue/red corporate palette; "
+                            "creative: purple/orange/pink vibrant palette; "
+                            "dark: near-black dark mode palette; "
+                            "pastel: soft pink/green/blue/yellow palette."
+                        ),
+                    },
+                    "updates": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id":    {"type": "string", "description": "Object ID from board state."},
+                                "color": {"type": "string", "description": "New hex color for this object."},
+                            },
+                            "required": ["id", "color"],
+                        },
+                        "description": (
+                            "One entry per object on the board. "
+                            "Use primary color for most objects, secondary and accent for variety. "
+                            "Every object in the board state must have an entry."
+                        ),
+                    },
+                },
+                "required": ["theme", "updates"],
+            },
+        },
+    },
     # ── Camera / viewport ─────────────────────────────────────────────────────
     {
         "type": "function",
@@ -491,6 +539,15 @@ ANALYSIS:
 - "summarize" / "summary" / "action items" / "analyze the board" / "/summarize" → summarizeBoard
   (read the board state above and synthesize real content — do not leave fields empty)
 
+THEMING:
+- "apply theme" / "make it professional" / "dark mode" / "use pastel" / "creative theme" / "change theme" → applyTheme
+  Assign a color to EVERY object in the board state. Vary primary/secondary/accent for visual interest.
+  Palettes:
+    professional: primary=#2C3E50  secondary=#3498DB  accent=#E74C3C
+    creative:     primary=#9B59B6  secondary=#F39C12  accent=#E91E63
+    dark:         primary=#1A1A1A  secondary=#4A4A4A  accent=#00BCD4
+    pastel:       primary=#FFB3BA  secondary=#BAFFC9  accent=#BAE1FF
+
 ═══ BOARD STATE ═══════════════════════════════════════════════════════════════
 {format_board_state(board_state)}
 """
@@ -563,7 +620,7 @@ async def ai_command_v2(body: AICommandRequest) -> AICommandResponse:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "4.0.0"}
+    return {"status": "ok", "version": "5.0.0"}
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
