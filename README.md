@@ -7,7 +7,7 @@ This repository contains the backend service for **CollabBoard**, a real-time co
 
 ---
 
-## 🤖 AI Features
+## AI Features
 
 The core of this service is an AI agent powered by **Claude 3.5 Sonnet** and orchestrated with **LangChain**. The agent is equipped with a suite of tools that allow it to perform a wide range of actions on the whiteboard, from creating simple shapes to generating complex templates and summarizing board content.
 
@@ -20,7 +20,7 @@ The core of this service is an AI agent powered by **Claude 3.5 Sonnet** and orc
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** [FastAPI](https://fastapi.tiangolo.com/)
 - **AI Orchestration:** [LangChain](https://www.langchain.com/)
@@ -30,7 +30,7 @@ The core of this service is an AI agent powered by **Claude 3.5 Sonnet** and orc
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### `POST /recognize-intent`
 
@@ -59,7 +59,7 @@ Returns the current status and version of the service.
 
 ---
 
-## 🚀 Getting Started (Local Development)
+##  Getting Started (Local Development)
 
 To run this service locally, follow these steps:
 
